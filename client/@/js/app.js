@@ -176,12 +176,14 @@ Promise.all([
     const {target} = event;
     const link = target.closest('a');
     if (link) {
-      const {href} = link;
-      const {hostname} = new URL(href);
-      // consider only local links
-      if (hostname === location.hostname) {
-        history.pushState(null, document.title, href);
+      let href = link.getAttribute('href');
+      // prevent the default only on local links
+      if (/^(?:\.|\/)/.test(href)) {
+        // normalize pagination
+        if (/^\.\/\?\d+$/.test(href))
+          href = lastURL.replace(/\/\?\d+$/, href.slice(1));
         event.preventDefault();
+        history.pushState(null, document.title, href);
         reveal(href);
       }
     }
