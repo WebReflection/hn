@@ -1,6 +1,26 @@
 const ITEMS_PP = 20;
 
-const rIC = self.requestIdleCallback || setTimeout;
+const fakebase = {
+  initializeApp({databaseURL}) {
+    this.databaseURL = databaseURL;
+  },
+  database() {
+    const {databaseURL} = this;
+    const asJSON = b => b.json();
+    const options = {credentials: 'same-origin'};
+    return {
+      ref: v => ({
+        child: path => ({
+          once(_, value) {
+            fetch(`${databaseURL}/${v}/${path}.json`, options)
+              .then(asJSON)
+              .then($ => value({val: () => $}))
+          }
+        })
+      })
+    };
+  }
+};
 
 const inject = (src, name) => new Promise($ => {
   const script = document.createElement('script');
@@ -10,16 +30,17 @@ const inject = (src, name) => new Promise($ => {
   document.head.appendChild(script);
 });
 
+const rIC = self.requestIdleCallback || setTimeout;
+
 Promise.all([
   // 3rd parts + local dependencies
   inject('../@/3rd/uhtml.js', 'uhtml'),
-  inject('../@/3rd/firebase.js', 'firebase'),
   import('./hn.js'),
   import('./view.js')
 ])
-.then(([uhtml, firebase, {default: hn}, {default: view}]) => {
+.then(([uhtml, {default: hn}, {default: view}]) => {
 
-  const {stories, story, item, user, parse} = hn(firebase);
+  const {stories, story, item, user, parse} = hn(fakebase);
   const {render, html} = uhtml;
   const {body} = document;
 
@@ -38,12 +59,14 @@ Promise.all([
   };
 
   const reveal = url => {
+    lastURL = url;
     body.classList.add('loading');
     const {id, page, type, pathname: current, user: name} = parse(url);
     const nav = header({page, header: {current, stories}});
     let waitingForUpdates = true;
     switch (type) {
       case 'item':
+        const itemURL = lastURL;
         item(id).then(model => {
           if (model) {
             rIC(stopLoading);
@@ -62,8 +85,10 @@ Promise.all([
               return story;
             };
             const update = () => {
-              updatePage(nav, details(model));
-              waitingForUpdates = true;
+              if (itemURL === lastURL) {
+                updatePage(nav, details(model));
+                waitingForUpdates = true;
+              }
             };
             model.comments = (model.kids || []).map(comments);
             update();
@@ -74,6 +99,7 @@ Promise.all([
         break;
 
       case 'story':
+        const storyURL = lastURL;
         story(current).then(ids => {
           rIC(stopLoading);
           const total = Math.ceil(ids.length / ITEMS_PP);
@@ -94,33 +120,40 @@ Promise.all([
             return story;
           });
           const update = () => {
-            updatePage(nav, main(items, page, total));
-            waitingForUpdates = true;
+            if (storyURL === lastURL) {
+              updatePage(nav, main(items, page, total));
+              waitingForUpdates = true;
+            }
           };
           update();
         });
         break;
 
       case 'user':
+        const userURL = lastURL;
         user(name).then(value => {
-          if (value) {
-            rIC(stopLoading);
-            updatePage(nav, profile(value));
-          }
-          else {
-            rIC(stopLoading);
-            updatePage(nav, notFound());
+          if (userURL === lastURL) {
+            if (value) {
+              rIC(stopLoading);
+              updatePage(nav, profile(value));
+            }
+            else {
+              rIC(stopLoading);
+              updatePage(nav, notFound());
+            }
           }
         });
         break;
 
       default:
         if (/\/about\/$/.test(url)) {
+          const aboutURL = lastURL;
           const top = header({page, header: {current: 'about', stories}});
-          updatePage(nav, html`<main />`);
           about().then(content => {
-            rIC(stopLoading);
-            updatePage(top, content);
+            if (aboutURL === lastURL) {
+              rIC(stopLoading);
+              updatePage(top, content);
+            }
           });
         }
         else {
@@ -130,6 +163,9 @@ Promise.all([
         break;
     }
   };
+
+  // guards against delayed answers
+  let lastURL = '';
 
   // in case it was not rendered via SSR, reveal the page
   if (!self.SSR)

@@ -36,8 +36,8 @@ export default firebase => {
 
   return {
     stories,
-    item: id => load(`/item/${id}`),
-    user: id => load(`/user/${id}`),
+    item: id => load(`item/${id}`),
+    user: id => load(`user/${id}`),
     story: type => load(`${type}stories`),
     parse: url => {
       const result = {
