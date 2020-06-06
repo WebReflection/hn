@@ -59,18 +59,20 @@ export default ({html}) => {
     </li>
   `;
 
-  const paginator = (page, total) => html`
+  const paginator = (current, page, total) => html`
     <div class="paginator">
       <a
         onclick=${scrollTop}
-        href=${`./?${page - 1}`} class=${page === 1 ? 'hidden' : ''}
+        href=${`../${current}/?${page - 1}`}
+        class=${page === 1 ? 'hidden' : ''}
       >
         &lt;
       </a>
       <span>${page}/${total}</span>
       <a
         onclick=${scrollTop}
-        href=${`./?${page + 1}`} class=${page === total ? 'hidden' : ''}
+        href=${`../${current}/?${page + 1}`}
+        class=${page === total ? 'hidden' : ''}
       >
         &gt;
       </a>
@@ -107,9 +109,9 @@ export default ({html}) => {
       </header>
     `,
 
-    main: (stories, page, total) => html`
+    main: (current, stories, page, total) => html`
       <main class="stories">
-        ${paginator(page, total)}
+        ${paginator(current, page, total)}
         ${stories.map(({index, model = {}}) => html`
           <article  class=${model.id ? '' : 'placeholder'}>
             <div>${index}</div>
@@ -141,7 +143,7 @@ export default ({html}) => {
             </div>
           </article>
         `)}
-        ${paginator(page, total)}
+        ${paginator(current, page, total)}
       </main>
     `,
 

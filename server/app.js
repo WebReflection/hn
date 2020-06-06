@@ -90,6 +90,7 @@ createServer(async (req, res) => {
         `${current}/index.html`,
         {page, header: {current, stories}},
         main(
+          current,
           await Promise.all(ids.slice(start, end).map(
             (id, index) => item(id).then(
               model => (

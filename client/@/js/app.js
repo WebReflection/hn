@@ -30,7 +30,7 @@ const inject = (src, name) => new Promise($ => {
   document.head.appendChild(script);
 });
 
-const isLive = () => !(
+const isBrowser = () => !(
   matchMedia('(display-mode: standalone)').matches ||
   navigator.standalone ||
   document.referrer.includes('android-app://')
@@ -127,7 +127,7 @@ Promise.all([
           });
           const update = () => {
             if (storyURL === lastURL) {
-              updatePage(nav, main(items, page, total));
+              updatePage(nav, main(current, items, page, total));
               waitingForUpdates = true;
             }
           };
@@ -182,13 +182,12 @@ Promise.all([
     const {target} = event;
     const link = target.closest('a');
     if (link) {
-      const {href} = link;
-      const {hostname} = new URL(href);
+      const href = link.getAttribute('href');
       // consider only local links
-      if (hostname === location.hostname) {
+      if (/^(?:\.|\/)/.test(href)) {
         event.preventDefault();
         reveal(href);
-        if (isLive())
+        if (isBrowser())
           history.pushState(null, document.title, href);
       }
     }

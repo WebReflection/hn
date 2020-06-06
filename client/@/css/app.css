@@ -44,7 +44,8 @@ nav .icon::before {
   font-size: .7rem;
   opacity: 0;
   transition: opacity .3s;
-  transform: translateY(calc(var(--padding) * 1.7 + var(--font-size)));
+  top: calc(var(--padding) / 2);
+  pointer-events: none;
 }
 
 nav ul, main.stories > article > *:last-of-type {
@@ -65,6 +66,13 @@ main.about pre {
   padding: var(--padding);
 }
 
+nav .icon, nav a
+{
+  --tb-padding: calc(var(--padding) * 2);
+  padding-top: var(--tb-padding);
+  padding-bottom: var(--tb-padding);
+}
+
 ul.comments {
   padding-bottom: 0;
   margin-bottom: 0;
@@ -77,7 +85,7 @@ nav a, nav a:visited {
 
 nav a.selected {
   border-bottom: 2px solid var(--color);
-  padding-bottom: calc(var(--padding) - 2px);
+  padding-bottom: calc(var(--tb-padding) - 2px);
 }
 
 nav li:last-of-type {
