@@ -30,6 +30,12 @@ const inject = (src, name) => new Promise($ => {
   document.head.appendChild(script);
 });
 
+const isLive = () => !(
+  matchMedia('(display-mode: standalone)').matches ||
+  navigator.standalone ||
+  document.referrer.includes('android-app://')
+);
+
 const rIC = self.requestIdleCallback || setTimeout;
 
 Promise.all([
@@ -176,15 +182,14 @@ Promise.all([
     const {target} = event;
     const link = target.closest('a');
     if (link) {
-      let href = link.getAttribute('href');
-      // prevent the default only on local links
-      if (/^(?:\.|\/)/.test(href)) {
-        // normalize pagination
-        if (/^\.\/\?\d+$/.test(href))
-          href = lastURL.replace(/\/\?\d+$/, href.slice(1));
+      const {href} = link;
+      const {hostname} = new URL(href);
+      // consider only local links
+      if (hostname === location.hostname) {
         event.preventDefault();
-        history.pushState(null, document.title, href);
         reveal(href);
+        if (isLive())
+          history.pushState(null, document.title, href);
       }
     }
   });
