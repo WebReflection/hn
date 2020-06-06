@@ -1,0 +1,207 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, nav ul, nav li, main.details > ul {
+  padding: 0;
+  margin: 0;
+}
+
+body.loading main,
+nav .icon:hover::before,
+h1 + p,
+h2 + p,
+main.details small,
+main.about li,
+main.about p,
+footer {
+  opacity: var(--opacity);
+}
+
+header,
+main.about code {
+  background-color: var(--background-header);
+}
+
+nav, main {
+  max-width: var(--max-width);
+  margin: auto;
+}
+
+nav, nav ul, main.stories > article {
+  display: flex;
+  flex-direction: row;
+}
+
+nav .icon {
+  cursor: none;
+}
+
+nav .icon::before {
+  position: absolute;
+  content: "Isomorphic Hacker News";
+  font-style: italic;
+  font-size: .7rem;
+  opacity: 0;
+  transition: opacity .3s;
+  transform: translateY(calc(var(--padding) * 1.7 + var(--font-size)));
+}
+
+nav ul, main.stories > article > *:last-of-type {
+  flex-grow: 1;
+}
+
+ul, li {
+  list-style: none;
+}
+
+a, a:visited {
+  color: var(--color);
+}
+
+nav .icon, nav a,
+ul.comments, main.details ul > li,
+main.about pre {
+  padding: var(--padding);
+}
+
+ul.comments {
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+nav a, nav a:visited {
+  display: inline-block;
+  text-decoration: none;
+}
+
+nav a.selected {
+  border-bottom: 2px solid var(--color);
+  padding-bottom: calc(var(--padding) - 2px);
+}
+
+nav li:last-of-type {
+  flex-grow: 1;
+  text-align: end;
+}
+
+main {
+  padding: var(--padding);
+  transition: opacity .3s;
+}
+
+article, main.details li {
+  width: 100%;
+  opacity: 1;
+  transition: opacity .3s;
+}
+
+article.placeholder,
+main.details li.placeholder {
+  opacity: 0;
+}
+
+article.placeholder > *,
+main.details li.placeholder > *{
+  visibility: hidden;
+}
+
+h1, h2 {
+  font-weight: normal;
+}
+
+h1 {
+  font-size: 1.3rem;
+}
+
+h2 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+h2 + p,
+main.details,
+main.details h2,
+main.details small + div {
+  margin-top: var(--padding);
+}
+
+h3 {
+  font-size: 1rem;
+}
+
+h3,
+ul.comments {
+  border-bottom: 1px solid var(--background-header);
+}
+
+article a, footer a {
+  color: var(--color);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--color);
+}
+
+main.stories > article > *:first-of-type {
+  margin-top: .175rem;
+  min-width: calc(var(--font-size) * 2.1);
+}
+
+.paginator {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.paginator > * {
+  padding: var(--padding);
+  user-select: none;
+}
+
+.paginator a {
+  min-width: calc(var(--font-size) * 2);
+  display: inline-block;
+  text-decoration: none;
+}
+
+.paginator a.hidden {
+  visibility: hidden;
+}
+
+.paginator :not(a) {
+  flex-grow: 1;
+}
+
+footer {
+  text-align: center;
+  padding: calc(var(--padding) * 2);
+  font-size: .9rem;
+}
+
+nav a, nav a:visited,
+.paginator a, footer a {
+  font-weight: bold;
+}
+
+main.stories > article > *:first-of-type,
+.paginator :not(a) {
+  font-size: .7rem;
+  opacity: var(--opacity);
+}
+
+main.about pre,
+main.about code {
+  font-size: .9rem;
+}
+
+@media (max-width: 480px) {
+  nav .icon {
+    display: none;
+  }
+  main.stories > article > *:first-of-type {
+    min-width: .7rem;
+    max-width: .7rem;
+    word-wrap: break-word;
+  }
+}

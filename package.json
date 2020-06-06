@@ -1,0 +1,32 @@
+{
+  "private": true,
+  "name": "hn",
+  "type": "module",
+  "scripts": {
+    "build": "npm run tpl && rm -rf docs && ucompress --source client --dest docs",
+    "tpl": "npm run tpl:about;npm run tpl:ask;npm run tpl:item;npm run tpl:job;npm run tpl:new;npm run tpl:show;npm run tpl:top;npm run tpl:user",
+    "tpl:about": "mkdir -p client/about; cp template/index.html client/about/",
+    "tpl:ask": "mkdir -p client/ask; cp template/index.html client/ask/",
+    "tpl:item": "mkdir -p client/item; cp template/index.html client/item/",
+    "tpl:job": "mkdir -p client/job; cp template/index.html client/job/",
+    "tpl:new": "mkdir -p client/new; cp template/index.html client/new/",
+    "tpl:show": "mkdir -p client/show; cp template/index.html client/show/",
+    "tpl:top": "mkdir -p client/top; cp template/index.html client/top/",
+    "tpl:user": "mkdir -p client/user; cp template/index.html client/user/",
+    "test:ssr": "PORT=3000 node server/app.js",
+    "test": "ucdn --debug --source client",
+    "start": "node server/app.js",
+    "postinstall": "npm run build"
+  },
+  "author": "Andrea Giammarchi",
+  "license": "ISC",
+  "devDependencies": {
+    "ucompress": "^0.17.3"
+  },
+  "dependencies": {
+    "firebase": "^7.15.0",
+    "ucdn": "^0.17.3",
+    "ucontent": "^1.5.1",
+    "umeta": "^0.2.4"
+  }
+}
