@@ -175,7 +175,8 @@ main.stories > article > *:first-of-type {
 
 footer {
   text-align: center;
-  padding: calc(var(--padding) * 2);
+  padding-top: calc(var(--padding) * 2);
+  padding-bottom: calc(var(--padding) * 4);
   font-size: .9rem;
 }
 
