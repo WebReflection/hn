@@ -204,4 +204,7 @@ main.about code {
     max-width: .7rem;
     word-wrap: break-word;
   }
+  main.about ul {
+    padding: var(--padding);
+  }
 }
