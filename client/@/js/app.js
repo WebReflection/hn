@@ -91,6 +91,7 @@ Promise.all([
         item(id).then(model => {
           if (model) {
             rIC(stopLoading);
+            document.title = `iHN: ${model.title}`;
             const comments = id => {
               const story = item(id);
               story.then(model => {
@@ -125,6 +126,7 @@ Promise.all([
           const total = Math.ceil(ids.length / ITEMS_PP);
           const start = ITEMS_PP * (page - 1);
           const end = ITEMS_PP * page;
+          document.title = `iHN: ${current} stories (${page}/${total})`;
           const items = ids.slice(start, end).map((id, index) => {
             const story = item(id);
             story.then(model => {
@@ -154,6 +156,7 @@ Promise.all([
           if (revealing) {
             if (value) {
               rIC(stopLoading);
+              document.title = `iHN: user ${value.id}`;
               updatePage(nav, profile(value));
             }
             else {
@@ -170,6 +173,7 @@ Promise.all([
           about().then(content => {
             if (revealing) {
               rIC(stopLoading);
+              document.title = 'iHN: About';
               updatePage(top, content);
             }
           });
@@ -211,22 +215,45 @@ Promise.all([
       // consider only local links without
       // resolving through link.href ;-)
       const href = link.getAttribute('href');
-      if (href === '#back') {
-        event.preventDefault();
-        if (IS_BROWSER)
-          history.back();
-        else if (1 < state.length) {
-          state.pop();
-          show.next(state[state.length - 1]);
-        }
-      }
-      else if (/^(?:\.|\/)/.test(href)) {
-        event.preventDefault();
-        show.next(href);
-        if (IS_BROWSER)
-          history.pushState(null, document.title, href);
-        else if (MAX_STATE < state.push(href))
-          state.shift();
+      switch (true) {
+        case href === '#back':
+          event.preventDefault();
+          if (IS_BROWSER)
+            history.back();
+          else if (1 < state.length) {
+            state.pop();
+            show.next(state[state.length - 1]);
+          }
+          break;
+        case href === '#share':
+          event.preventDefault();
+          const url = IS_BROWSER ? location.href : state[state.length - 1];
+          const {previousElementSibling} = link;
+          const fail = () => {
+            previousElementSibling.textContent = '⚠ error';
+          };
+          if (navigator.share)
+            navigator.share({
+              title: 'iHN',
+              text: document.title,
+              url
+            }).then(() => {}, fail);
+          else
+            navigator.clipboard.writeText(url).then(
+              () => {
+                previousElementSibling.textContent = 'copied to clipboard';
+              },
+              fail
+            );
+          break;
+        case /^(?:\.|\/)/.test(href):
+          event.preventDefault();
+          show.next(href);
+          if (IS_BROWSER)
+            history.pushState(null, document.title, href);
+          else if (MAX_STATE < state.push(href))
+            state.shift();
+          break;
       }
     }
   });

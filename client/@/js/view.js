@@ -65,8 +65,8 @@ export default ({html}) => {
   const goBack = () => html`
     <div class="paginator">
       <a href="#back">&lt;</a>
-      <span>go back</span>
-      <a href="#back" style="visibility:hidden">&lt;</a>
+      <span>go back / share</span>
+      <a href="#share">📤</a>
     </div>
   `;
 
