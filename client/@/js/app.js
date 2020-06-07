@@ -227,8 +227,8 @@ Promise.all([
           break;
         case href === '#share':
           event.preventDefault();
-          const url = IS_BROWSER ? location.href : state[state.length - 1];
           const {previousElementSibling} = link;
+          const url = IS_BROWSER ? location.href : state[state.length - 1];
           const fail = () => {
             previousElementSibling.textContent = '⚠ error';
           };
@@ -239,12 +239,19 @@ Promise.all([
               url
             }).then(() => {}, fail);
           else
-            navigator.clipboard.writeText(url).then(
-              () => {
-                previousElementSibling.textContent = 'copied to clipboard';
-              },
-              fail
-            );
+            navigator.permissions.query({
+              name: 'clipboard-write'
+            }).then(({state}) => {
+              if (/^(?:granted|prompt)$/.test(state))
+                navigator.clipboard.writeText(url).then(
+                  () => {
+                    previousElementSibling.textContent = 'copied to clipboard';
+                  },
+                  fail
+                );
+              else
+                fail();
+            });
           break;
         case /^(?:\.|\/)/.test(href):
           event.preventDefault();
