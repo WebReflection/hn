@@ -31,7 +31,7 @@ const fakebase = {
 // then it executes it with new arguments
 // and it stores the returned effect (repeat)
 const fx = (f, x = () => {}) => ({
-  next(...$) { x(); x = f(...$); }
+  next($) { x(); x = f($); }
 });
 
 // promisify a <script> injection, assuming
