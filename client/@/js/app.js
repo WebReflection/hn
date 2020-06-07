@@ -30,10 +30,7 @@ const fakebase = {
 // then it executes it with new arguments
 // and it stores the returned effect (repeat)
 const fx = (f, x = () => {}) => ({
-  next(...$) {
-    x();
-    x = f(...$);
-  }
+  next(...$) { x(); x = f(...$); }
 });
 
 // promisify a <script> injection, assuming
@@ -198,6 +195,9 @@ Promise.all([
   // guards against delayed answers
   let show = fx(reveal);
 
+  // used to provide a back action in standalone mode
+  const state = [];
+
   // in case it was not rendered via SSR, reveal the page
   if (!self.SSR)
     show.next(location.href);
@@ -210,11 +210,20 @@ Promise.all([
       // consider only local links without
       // resolving through link.href ;-)
       const href = link.getAttribute('href');
-      if (/^(?:\.|\/)/.test(href)) {
+      if (href === '#back') {
+        event.preventDefault();
+        if (IS_BROWSER)
+          history.back();
+        else if (state.length)
+          show.next(state.pop());
+      }
+      else if (/^(?:\.|\/)/.test(href)) {
         event.preventDefault();
         show.next(href);
         if (IS_BROWSER)
           history.pushState(null, document.title, href);
+        else if (ITEMS_PP < state.push(href))
+          state.shift();
       }
     }
   });

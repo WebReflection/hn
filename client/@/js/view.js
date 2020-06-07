@@ -40,7 +40,10 @@ export default ({html}) => {
 
   // internal helpers
   const comment = ({model = {comments: []}}) => html`
-    <li class=${model.id ? '' : 'placeholder'}>
+    <li
+      class=${model.id ? '' : 'placeholder'}
+      .hidden=${!!model.deleted}
+    >
       <small>
         <a
           onclick=${scrollTop}
@@ -57,6 +60,14 @@ export default ({html}) => {
         ${model.comments.map(comment)}
       </ul>
     </li>
+  `;
+
+  const goBack = () => html`
+    <div class="paginator">
+      <a href="#back">&lt;</a>
+      <span>go back</span>
+      <a href="#back" style="visibility:hidden">&lt;</a>
+    </div>
   `;
 
   const paginator = (current, page, total) => html`
@@ -79,8 +90,14 @@ export default ({html}) => {
     </div>
   `;
 
-  // exposed renders
   return {
+    // the about section contains only static content
+    // it is OK in such case to import it on demand, instead of having it
+    // bundled within the rest of the logic
+    about: () => import('./about.js').then(({default: about}) => about(html)),
+
+    // all other sections are neither too big nor static,
+    // so these are grouped in here for simplicity
     header: ({header: {current, stories}}) => html`
       <header>
         <nav>
@@ -109,11 +126,21 @@ export default ({html}) => {
       </header>
     `,
 
+    footer: () => html`
+      <footer>
+        Powered by
+        <a href="https://github.com/WebReflection/uhtml#readme">µhtml</a>
+        &amp;
+        <a href="https://github.com/HackerNews/API">Hacker News API</a>
+      </footer>
+    `,
+
+    // show all details per story
     main: (current, stories, page, total) => html`
       <main class="stories">
         ${paginator(current, page, total)}
         ${stories.map(({index, model = {}}) => html`
-          <article  class=${model.id ? '' : 'placeholder'}>
+          <article class=${model.id ? '' : 'placeholder'}>
             <div>${index}</div>
             <div>
               <h2>
@@ -147,25 +174,13 @@ export default ({html}) => {
       </main>
     `,
 
-    footer: () => html`
-      <footer>
-        Powered by
-        <a href="https://github.com/WebReflection/uhtml#readme">µhtml</a>
-        &amp;
-        <a href="https://github.com/HackerNews/API">Hacker News API</a>
-      </footer>
-    `,
-
-    // the about section contains only static content
-    // it is OK in such case to import it on demand, instead of having it
-    // bundled within the rest of the logic
-    about: () => import('./about.js').then(({default: about}) => about(html)),
-
+    // show all details per item
     details: model => html`
       <main class="details">
+        ${goBack()}
         <article>
           <h2>
-            <a href="${model.url}">
+            <a href=${model.url}>
               ${model.title}
               <small>${(model.hostname || '').replace(/^www\./, '')}</small>
             </a>
@@ -184,11 +199,14 @@ export default ({html}) => {
         <ul .hidden=${!model.comments.length}>
           ${model.comments.map(comment)}
         </ul>
+        ${goBack()}
       </main>
     `,
 
+    // show all details per user
     profile: ({about, created, id, karma}) => html`
       <main class="profile">
+      ${goBack()}
         <article>
           <h1>${id}</h1>
           <p>
@@ -204,9 +222,12 @@ export default ({html}) => {
             ${html([about])}
           </div>
         </article>
+        ${goBack()}
       </main>
     `,
 
+    // final fallback to show when something goes wrong
+    // such as non-existent user/item
     notFound: () => html`
       <main class="not-found">
         <article>

@@ -128,7 +128,6 @@ h2 {
 }
 
 h2 + p,
-main.details,
 main.details h2,
 main.details small + div {
   margin-top: var(--padding);
