@@ -95,7 +95,7 @@ Promise.all([
         item(id).then(model => {
           if (model) {
             rIC(stopLoading);
-            document.title = model.title;
+            document.title = `iHN: ${model.title}`;
             const comments = id => {
               const story = item(id);
               story.then(model => {
@@ -131,7 +131,7 @@ Promise.all([
           const total = Math.ceil(ids.length / ITEMS_PP);
           const start = ITEMS_PP * (page - 1);
           const end = ITEMS_PP * page;
-          document.title = `${current} stories (${page}/${total})`;
+          document.title = `iHN: ${current} (${page}/${total})`;
           const items = ids.slice(start, end).map((id, index) => {
             const story = item(id);
             story.then(model => {
@@ -162,7 +162,7 @@ Promise.all([
           if (revealing) {
             if (value) {
               rIC(stopLoading);
-              document.title = `User ${value.id}`;
+              document.title = `iHN: user ${value.id}`;
               updatePage(nav, profile(value));
             }
             else {
@@ -180,7 +180,7 @@ Promise.all([
           about().then(content => {
             if (revealing) {
               rIC(stopLoading);
-              document.title = 'About';
+              document.title = 'iHN: about';
               updatePage(top, content);
             }
           });
