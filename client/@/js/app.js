@@ -1,5 +1,7 @@
 const ITEMS_PP = 20;
 
+// the most minimal implementation of firebase.js
+// needed to fetch hacker-news.firebaseio.com
 const fakebase = {
   initializeApp({databaseURL}) {
     this.databaseURL = databaseURL;
@@ -22,6 +24,21 @@ const fakebase = {
   }
 };
 
+// given a function that returns an "effect"
+// that should run before being invoked again,
+// it grants such effect is indeed invoked,
+// then it executes it with new arguments
+// and it stores the returned effect (repeat)
+const fx = (f, x = () => {}) => ({
+  next(...$) {
+    x();
+    x = f(...$);
+  }
+});
+
+// promisify a <script> injection, assuming
+// the script will have a global export
+// that is passed along as promise resolution
 const inject = (src, name) => new Promise($ => {
   const script = document.createElement('script');
   script.onload = () => $(self[name]);
@@ -30,23 +47,26 @@ const inject = (src, name) => new Promise($ => {
   document.head.appendChild(script);
 });
 
+// avoid history API shenanigans on standalone mode,
+// return true if the Web App is running as PWA (installed)
 const isPWA = () => (
   matchMedia('(display-mode: standalone)').matches ||
   navigator.standalone ||
   document.referrer.includes('android-app://')
 );
 
+// used to avoid keeping the CPU busy all time
 const rIC = self.requestIdleCallback || setTimeout;
 
+// 3rd parts + local dependencies
 Promise.all([
-  // 3rd parts + local dependencies
   inject('../@/3rd/uhtml.js', 'uhtml'),
   import('./hn.js'),
   import('./view.js')
 ])
 .then(([uhtml, {default: hn}, {default: view}]) => {
 
-  const isBrowser = !isPWA();
+  const IS_BROWSER = !isPWA();
 
   const {stories, story, item, user, parse} = hn(fakebase);
   const {render, html} = uhtml;
@@ -58,23 +78,18 @@ Promise.all([
     notFound
   } = view(uhtml);
 
-  const stopLoading = () => {
-    body.classList.remove('loading');
-  };
-
-  const updatePage = (header, main) => {
-    render(body, html`${header}${main}${footer()}`);
-  };
-
+  // main Web App handler: route in, output out
+  // it returns an "effect" to stop rendering if
+  // the user navigated somewhere else while it
+  // incrementally keeps loading content previously requested
   const reveal = url => {
-    lastURL = url;
     body.classList.add('loading');
     const {id, page, type, pathname: current, user: name} = parse(url);
     const nav = header({page, header: {current, stories}});
+    let revealing = true;
     let waitingForUpdates = true;
     switch (type) {
       case 'item':
-        const itemURL = lastURL;
         item(id).then(model => {
           if (model) {
             rIC(stopLoading);
@@ -93,7 +108,7 @@ Promise.all([
               return story;
             };
             const update = () => {
-              if (itemURL === lastURL) {
+              if (revealing) {
                 updatePage(nav, details(model));
                 waitingForUpdates = true;
               }
@@ -107,7 +122,6 @@ Promise.all([
         break;
 
       case 'story':
-        const storyURL = lastURL;
         story(current).then(ids => {
           rIC(stopLoading);
           const total = Math.ceil(ids.length / ITEMS_PP);
@@ -128,7 +142,7 @@ Promise.all([
             return story;
           });
           const update = () => {
-            if (storyURL === lastURL) {
+            if (revealing) {
               updatePage(nav, main(current, items, page, total));
               waitingForUpdates = true;
             }
@@ -138,9 +152,8 @@ Promise.all([
         break;
 
       case 'user':
-        const userURL = lastURL;
         user(name).then(value => {
-          if (userURL === lastURL) {
+          if (revealing) {
             if (value) {
               rIC(stopLoading);
               updatePage(nav, profile(value));
@@ -155,10 +168,9 @@ Promise.all([
 
       default:
         if (/\/about\/$/.test(url)) {
-          const aboutURL = lastURL;
           const top = header({page, header: {current: 'about', stories}});
           about().then(content => {
-            if (aboutURL === lastURL) {
+            if (revealing) {
               rIC(stopLoading);
               updatePage(top, content);
             }
@@ -170,35 +182,47 @@ Promise.all([
         }
         break;
     }
+    return () => {
+      revealing = false;
+    };
+  };
+
+  const stopLoading = () => {
+    body.classList.remove('loading');
+  };
+
+  const updatePage = (header, main) => {
+    render(body, html`${header}${main}${footer()}`);
   };
 
   // guards against delayed answers
-  let lastURL = '';
+  let show = fx(reveal);
 
   // in case it was not rendered via SSR, reveal the page
   if (!self.SSR)
-    reveal(location.href);
+    show.next(location.href);
 
   // handle all local routes
   body.addEventListener('click', event => {
     const {target} = event;
     const link = target.closest('a');
     if (link) {
+      // consider only local links without
+      // resolving through link.href ;-)
       const href = link.getAttribute('href');
-      // consider only local links
       if (/^(?:\.|\/)/.test(href)) {
         event.preventDefault();
-        reveal(href);
-        if (isBrowser)
+        show.next(href);
+        if (IS_BROWSER)
           history.pushState(null, document.title, href);
       }
     }
   });
 
   // reveal previous routes if in browser
-  if (isBrowser)
+  if (IS_BROWSER)
     self.addEventListener('popstate', () => {
-      reveal(location.href);
+      show.next(location.href);
     });
 
   // make it a PWA 🎉
