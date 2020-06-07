@@ -66,7 +66,7 @@ Promise.all([
 
   const IS_BROWSER = !isPWA();
 
-  const {stories, story, item, user, parse, cache} = hn(fakebase);
+  const {stories, story, item, user, parse, cache} = hn(fakebase, 1000 * 60);
   const {render, html} = uhtml;
   const {body} = document;
 

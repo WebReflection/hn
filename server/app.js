@@ -25,7 +25,7 @@ const {dirName} = umeta(import.meta);
 const cdn = ucdn({source: join(dirName, '..', 'client')});
 
 // app
-const {stories, story, item, user, parse} = hn(firebase);
+const {stories, story, item, user, parse} = hn(firebase, 1000 * 60 * 5);
 const {render, html} = ucontent;
 
 const {

@@ -1,11 +1,9 @@
-// 5 minutes cache per item
-const MAX_AGE = 1000 * 60 * 5;
-
 const remove = (map, key) => {
   map.delete(key);
 };
 
-export default firebase => {
+export default (firebase, MAX_AGE) => {
+
   firebase.initializeApp({
     databaseURL: 'https://hacker-news.firebaseio.com'
   });
@@ -21,18 +19,23 @@ export default firebase => {
   ];
 
   const cache = new Map;
-  const set = (key, value) => {
-    const details = {
-      t: setTimeout(remove, MAX_AGE, cache, key),
-      $: value
-    };
-    cache.set(key, details);
-    return details;
-  };
+  const request = key => new Promise($ => {
+    db.child(key).once('value', snap => {
+      const value = snap.val();
+      // if there is a value, clean it up in MAX_AGE time
+      if (value)
+        setTimeout(remove, MAX_AGE, cache, key);
+      // otherwise drop it already, as it's useless
+      else
+        cache.delete(key);
+      // resolve for the time being whatever value it has
+      $(value);
+    });
+  });
 
-  const load = key => (cache.get(key) || set(key, new Promise($ => {
-    db.child(key).once('value', snap => $(snap.val()));
-  }))).$;
+  // cache each request until it's resolved
+  const load = key => cache.get(key) ||
+                      cache.set(key, request(key)).get(key);
 
   return {
     cache,
