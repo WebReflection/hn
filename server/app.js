@@ -35,6 +35,19 @@ const {
 } = view(ucontent);
 
 const SSR = html`<script>self.SSR=!0;</script>`;
+
+const addComments = async (model) => {
+  const {kids} = model;
+  model.comments = kids ? await Promise.all(kids.map(comments)) : [];
+  return model;
+};
+
+const comments = id => item(id).then(getModel);
+
+const getModel = async (model) => (
+  {model: model ? await addComments(model) : null}
+);
+
 const renderPage = (res, template, nav, main) => {
   res.writeHead(200, HTML);
   render(res, html(
@@ -50,26 +63,18 @@ const renderPage = (res, template, nav, main) => {
 createServer(async (req, res) => {
   const {url} = req;
   const {id, page, type, pathname: current, user: name} = parse(url);
+
   switch (type) {
+    // show a specific item details with comments
     case 'item': {
       const model = await item(id);
-      if (model) {
-        const comments = id => item(id).then(async (model) => {
-          if (model) {
-            model.comments = await Promise.all(
-              (model.kids || []).map(comments)
-            );
-          }
-          return {model};
-        });
-        model.comments = await Promise.all((model.kids || []).map(comments));
+      if (model)
         renderPage(
           res,
           `${current}/index.html`,
           {page, header: {current, stories}},
-          details(model)
+          details(await addComments(model))
         );
-      }
       else
         renderPage(
           res,
@@ -80,6 +85,7 @@ createServer(async (req, res) => {
       break;
     }
 
+    // show all items associated to this story
     case 'story': {
       const ids = await story(current);
       const total = Math.ceil(ids.length / ITEMS_PP);
@@ -107,6 +113,7 @@ createServer(async (req, res) => {
       break;
     }
 
+    // show user details
     case 'user': {
       const model = await user(name);
       if (model)
@@ -126,22 +133,21 @@ createServer(async (req, res) => {
       break;
     }
 
-    default:
+    default: {
       // root of the site
       if (/^\/(?:\?.*)?$/.test(url)) {
         res.writeHead(200, HTML);
         render(res, html(asTemplate('index.html'))).end();
       }
       // about page
-      else if (/\/about\/$/.test(url)) {
+      else if (/\/about\/$/.test(url))
         renderPage(
           res,
           `about/index.html`,
           {page, header: {current: 'about', stories}},
           await about()
         );
-      }
-      // any other asset with fallback a 404 fallback
+      // any other asset with a 404 fallback
       else
         cdn(req, res, () => {
           renderPage(
@@ -152,6 +158,7 @@ createServer(async (req, res) => {
           );
         });
       break;
+    }
   }
 })
 .listen(
