@@ -30,7 +30,7 @@ const inject = (src, name) => new Promise($ => {
   document.head.appendChild(script);
 });
 
-const isBrowser = () => !(
+const isPWA = () => (
   matchMedia('(display-mode: standalone)').matches ||
   navigator.standalone ||
   document.referrer.includes('android-app://')
@@ -45,6 +45,8 @@ Promise.all([
   import('./view.js')
 ])
 .then(([uhtml, {default: hn}, {default: view}]) => {
+
+  const isBrowser = !isPWA();
 
   const {stories, story, item, user, parse} = hn(fakebase);
   const {render, html} = uhtml;
@@ -187,16 +189,17 @@ Promise.all([
       if (/^(?:\.|\/)/.test(href)) {
         event.preventDefault();
         reveal(href);
-        if (isBrowser())
+        if (isBrowser)
           history.pushState(null, document.title, href);
       }
     }
   });
 
-  // reveal previous routes
-  self.addEventListener('popstate', () => {
-    reveal(location.href);
-  });
+  // reveal previous routes if in browser
+  if (isBrowser)
+    self.addEventListener('popstate', () => {
+      reveal(location.href);
+    });
 
   // make it a PWA 🎉
   if ('serviceWorker' in navigator)
