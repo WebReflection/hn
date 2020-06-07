@@ -95,7 +95,7 @@ Promise.all([
         item(id).then(model => {
           if (model) {
             rIC(stopLoading);
-            document.title = `iHN: ${model.title}`;
+            document.title = model.title;
             const comments = id => {
               const story = item(id);
               story.then(model => {
@@ -131,7 +131,7 @@ Promise.all([
           const total = Math.ceil(ids.length / ITEMS_PP);
           const start = ITEMS_PP * (page - 1);
           const end = ITEMS_PP * page;
-          document.title = `iHN: ${current} stories (${page}/${total})`;
+          document.title = `${current} stories (${page}/${total})`;
           const items = ids.slice(start, end).map((id, index) => {
             const story = item(id);
             story.then(model => {
@@ -162,7 +162,7 @@ Promise.all([
           if (revealing) {
             if (value) {
               rIC(stopLoading);
-              document.title = `iHN: user ${value.id}`;
+              document.title = `User ${value.id}`;
               updatePage(nav, profile(value));
             }
             else {
@@ -180,7 +180,7 @@ Promise.all([
           about().then(content => {
             if (revealing) {
               rIC(stopLoading);
-              document.title = 'iHN: About';
+              document.title = 'About';
               updatePage(top, content);
             }
           });
@@ -235,31 +235,33 @@ Promise.all([
           break;
         case href === '#share':
           event.preventDefault();
-          const {previousElementSibling} = link;
           const url = IS_BROWSER ? location.href : state[state.length - 1];
-          const fail = () => {
-            previousElementSibling.textContent = '⚠ error';
-          };
+          const {title} = document;
           if (navigator.share)
             navigator.share({
-              title: 'iHN',
-              text: document.title,
+              text: title,
+              title,
               url
-            }).then(() => {}, fail);
-          else
+            });
+          else {
+            const {previousElementSibling} = link;
+            const fail = () => {
+              previousElementSibling.textContent = '⚠ error';
+            };
             navigator.permissions.query({
               name: 'clipboard-write'
             }).then(({state}) => {
               if (/^(?:granted|prompt)$/.test(state))
                 navigator.clipboard.writeText(url).then(
                   () => {
-                    previousElementSibling.textContent = 'copied to clipboard';
+                    previousElementSibling.textContent = '✔ copied';
                   },
                   fail
                 );
               else
                 fail();
             });
+          }
           break;
         case /^(?:\.|\/)/.test(href):
           event.preventDefault();
