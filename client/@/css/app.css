@@ -60,6 +60,15 @@ a, a:visited {
   color: var(--color);
 }
 
+main {
+  word-wrap: break-word;
+}
+
+pre {
+  font-size: .9rem;
+  white-space: pre-wrap;
+}
+
 nav .icon, nav a,
 ul.comments, main.details ul > li,
 main.about pre {
@@ -196,11 +205,6 @@ main.stories > article > *:first-of-type,
 .paginator :not(a) {
   font-size: .7rem;
   opacity: var(--opacity);
-}
-
-main.about pre,
-main.about code {
-  font-size: .9rem;
 }
 
 @media (max-width: 480px) {
