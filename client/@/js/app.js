@@ -82,11 +82,15 @@ Promise.all([
   // incrementally keeps loading content previously requested
   const reveal = url => {
     body.classList.add('loading');
+
     const {id, page, type, pathname: current, user: name} = parse(url);
     const nav = header({page, header: {current, stories}});
+
     let revealing = true;
     let waitingForUpdates = true;
+
     switch (type) {
+      // show a specific item details with comments
       case 'item':
         item(id).then(model => {
           if (model) {
@@ -120,6 +124,7 @@ Promise.all([
         });
         break;
 
+      // show all items associated to this story
       case 'story':
         story(current).then(ids => {
           rIC(stopLoading);
@@ -151,6 +156,7 @@ Promise.all([
         });
         break;
 
+      // show user details
       case 'user':
         user(name).then(value => {
           if (revealing) {
@@ -168,6 +174,7 @@ Promise.all([
         break;
 
       default:
+        // about page
         if (/\/about\/$/.test(url)) {
           const top = header({page, header: {current: 'about', stories}});
           about().then(content => {
@@ -178,6 +185,7 @@ Promise.all([
             }
           });
         }
+        // the 404 fallback
         else {
           rIC(stopLoading);
           updatePage(nav, notFound());
