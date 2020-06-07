@@ -230,6 +230,7 @@ export default ({html}) => {
     // such as non-existent user/item
     notFound: () => html`
       <main class="not-found">
+        ${goBack()}
         <article>
           <h1>Not Found</h1>
           <p>The page you are looking for is not here.</p>

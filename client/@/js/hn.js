@@ -20,21 +20,22 @@ export default firebase => {
     'job'
   ];
 
-  const map = new Map;
+  const cache = new Map;
   const set = (key, value) => {
     const details = {
-      t: setTimeout(remove, MAX_AGE, map, key),
+      t: setTimeout(remove, MAX_AGE, cache, key),
       $: value
     };
-    map.set(key, details);
+    cache.set(key, details);
     return details;
   };
 
-  const load = key => (map.get(key) || set(key, new Promise($ => {
+  const load = key => (cache.get(key) || set(key, new Promise($ => {
     db.child(key).once('value', snap => $(snap.val()));
   }))).$;
 
   return {
+    cache,
     stories,
     item: id => load(`item/${id}`),
     user: id => load(`user/${id}`),

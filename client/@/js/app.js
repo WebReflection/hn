@@ -66,7 +66,7 @@ Promise.all([
 
   const IS_BROWSER = !isPWA();
 
-  const {stories, story, item, user, parse} = hn(fakebase);
+  const {stories, story, item, user, parse, cache} = hn(fakebase);
   const {render, html} = uhtml;
   const {body} = document;
 
@@ -277,11 +277,15 @@ Promise.all([
 
   // reveal previous routes if in browser
   if (IS_BROWSER)
-    self.addEventListener('popstate', () => {
+    addEventListener('popstate', () => {
       show.next(location.href);
     });
+
+  // retry to load items when the browser goes online
+  addEventListener('online', () => cache.clear());
 
   // make it a PWA 🎉
   if ('serviceWorker' in navigator)
     navigator.serviceWorker.register('../sw.js', {scope: '../'});
+
 });
