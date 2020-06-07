@@ -136,7 +136,7 @@ h2 {
   margin: 0;
 }
 
-h2 + p,
+h1, h2 + p,
 main.details h2,
 main.details small + div {
   margin-top: var(--padding);
