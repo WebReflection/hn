@@ -1,5 +1,10 @@
 export default html => html`
   <main class="about">
+    <div class="paginator">
+      <a href="#back">&lt;</a>
+      <span>go back / share</span>
+      <a href="#share">📤</a>
+    </div>
     <h1>Isomorphic Hacker News</h1>
     <div>
       <p>
@@ -65,6 +70,11 @@ export default html => html`
         I hope this project will inspire new, as well as old, Web developers, as it's definitively something
         anyone could do without needing to move away from plain Web standards 🎉
       </p>
+    </div>
+    <div class="paginator">
+      <a href="#back">&lt;</a>
+      <span>go back / share</span>
+      <a href="#share">📤</a>
     </div>
   </main>
 `;
