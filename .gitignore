@@ -1,6 +1,12 @@
 .DS_Store
-client/
-!client/@/
+client/about
+client/ask
+client/item
+client/job
+client/new
+client/show
+client/top
+client/user
 node_modules/
 !docs/node_modules/
 package-lock.json
