@@ -1,4 +1,5 @@
 const ITEMS_PP = 20;
+const MAX_STATE = 50;
 
 // the most minimal implementation of firebase.js
 // needed to fetch hacker-news.firebaseio.com
@@ -214,15 +215,17 @@ Promise.all([
         event.preventDefault();
         if (IS_BROWSER)
           history.back();
-        else if (state.length)
-          show.next(state.pop());
+        else if (1 < state.length) {
+          state.pop();
+          show.next(state[state.length - 1]);
+        }
       }
       else if (/^(?:\.|\/)/.test(href)) {
         event.preventDefault();
         show.next(href);
         if (IS_BROWSER)
           history.pushState(null, document.title, href);
-        else if (ITEMS_PP < state.push(href))
+        else if (MAX_STATE < state.push(href))
           state.shift();
       }
     }
