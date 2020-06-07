@@ -196,7 +196,7 @@ Promise.all([
   let show = fx(reveal);
 
   // used to provide a back action in standalone mode
-  const state = [];
+  const state = [location.href];
 
   // in case it was not rendered via SSR, reveal the page
   if (!self.SSR)
