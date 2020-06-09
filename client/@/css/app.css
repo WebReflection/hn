@@ -211,6 +211,28 @@ main.stories > article > *:first-of-type,
   opacity: var(--opacity);
 }
 
+/* collapsible comments */
+a[data-count]::before {
+  display: inline-block;
+  content: "[ - ]";
+}
+
+a[data-count]:hover::before {
+  text-decoration: underline;
+}
+
+a[data-count="0"]::before {
+  display: none;
+}
+
+.collapsed a[data-count]::before {
+  content: "[" attr(data-count) " more]";
+}
+
+.collapsed > div, .collapsed > ul {
+  display: none;
+}
+
 @media (max-width: 480px) {
   nav .icon {
     display: none;

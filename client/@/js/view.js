@@ -11,6 +11,11 @@ const ago = (created) => {
   return Math.ceil(elapsedDays) + ' days ago';
 };
 
+const count = (comments = []) => comments.reduce(
+  (total, value) => total + count((value.model || {}).comments),
+  comments.length
+);
+
 const plural = (num, unit) => {
   num = num >>> 0;
   if (num !== 1) unit += 's';
@@ -48,10 +53,9 @@ export default ({html}) => {
         <a
           onclick=${scrollTop}
           href=${`../user/?${model.by}`}
-        >
-          ${model.by || '...'}
-        </a>
+        >${model.by || '...'}</a>
         ${timeBetween(model.time)} ago
+        <a href="#collapse" data-count=${count(model.comments)} />
       </small>
       <div>
         ${html([model.text || '...'])}
@@ -147,8 +151,7 @@ export default ({html}) => {
                 <a
                   onclick=${scrollTop}
                   href='${model.url || `../item/?${model.id}`}'
-                >
-                  ${model.title || '...'}
+                >${model.title || '...'}
                   <small>
                     ${(model.hostname || '').replace(/^www\./, '')}
                   </small>
@@ -159,16 +162,12 @@ export default ({html}) => {
                 <a
                   onclick=${scrollTop}
                   href='${`../user/?${model.by}`}'
-                >
-                  ${model.by}
-                </a>
+                >${model.by}</a>
                 ${timeBetween(model.time)} ago |
                 <a
                   class="nowrap"
                   onclick=${scrollTop} href=${`../item/?${model.id}`}
-                >
-                  ${model.descendants || 0} comments
-                </a>
+                >${model.descendants || 0} comments</a>
               </p>
             </div>
           </article>
@@ -190,9 +189,10 @@ export default ({html}) => {
           </h2>
           <p class="meta">
             ${model.score} points by
-            <a onclick=${scrollTop} href=${`../user/?${model.by}`}>
-              ${model.by}
-            </a>
+            <a
+              onclick=${scrollTop}
+              href=${`../user/?${model.by}`}
+            >${model.by}</a>
             ${timeBetween(model.time)} ago
           </p>
         </article>

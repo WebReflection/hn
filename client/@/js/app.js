@@ -233,6 +233,9 @@ Promise.all([
             show.next(state[state.length - 1]);
           }
           break;
+        case href === '#collapse':
+          link.closest('li').classList.toggle('collapsed');
+          break;
         case href === '#share':
           event.preventDefault();
           const url = IS_BROWSER ? location.href : state[state.length - 1];
