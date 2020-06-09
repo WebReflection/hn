@@ -2,7 +2,7 @@ const remove = (map, key) => {
   map.delete(key);
 };
 
-export default (firebase, MAX_AGE) => {
+export default (firebase, MAX_AGE = 1000 * 60 * 5) => {
 
   firebase.initializeApp({
     databaseURL: 'https://hacker-news.firebaseio.com'
