@@ -163,7 +163,10 @@ export default ({html}) => {
                   ${model.by}
                 </a>
                 ${timeBetween(model.time)} ago |
-                <a onclick=${scrollTop} href=${`../item/?${model.id}`}>
+                <a
+                  class="nowrap"
+                  onclick=${scrollTop} href=${`../item/?${model.id}`}
+                >
                   ${model.descendants || 0} comments
                 </a>
               </p>

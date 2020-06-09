@@ -18,6 +18,10 @@ footer {
   opacity: var(--opacity);
 }
 
+.nowrap {
+  white-space: nowrap;
+}
+
 header,
 main.about code {
   background-color: var(--background-header);
