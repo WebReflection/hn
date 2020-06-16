@@ -79,6 +79,11 @@ main.about pre {
   padding: var(--padding);
 }
 
+ul.comments, main.details ul > li
+{
+  padding-inline-end: 0;
+}
+
 nav .icon, nav a
 {
   --tb-padding: calc(var(--padding) * 2);
