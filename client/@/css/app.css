@@ -226,9 +226,11 @@ a[data-count]:hover::before {
   text-decoration: underline;
 }
 
+/* should no comments not be collapsible?
 a[data-count="0"]::before {
   display: none;
 }
+*/
 
 .collapsed a[data-count]::before {
   content: "[" attr(data-count) " more]";
