@@ -6,23 +6,38 @@ const teapot = {
 
 const openCache = caches.open('iHN-teapot');
 
+const get = (cache, request) => fetch(request)
+  .then(response => {
+    const {status} = response;
+    if (199 < status && status < 400)
+      cache.put(request, response.clone());
+    return response;
+  })
+  .catch(offline);
+
+//* live first / cache as fallback
+const live = request => openCache.then(cache => {
+  const remote = get(cache, request);
+  return Promise.all([
+    cache.match(request).then(value => (value || remote)),
+    remote
+  ]).then(results => results.pop());
+});
+//*/
+
+/* cache first / live update regardless
+const local = request => openCache.then(cache => {
+  const remote = get(cache, request);
+  return Promise.race([
+    cache.match(request).then(value => (value || remote)),
+    remote
+  ]);
+});
+//*/
+
 addEventListener('fetch', e => {
   const {request} = e;
-  e.respondWith(
-    openCache.then(
-      cache => Promise.all([
-        cache.match(request),
-        fetch(request).catch(offline)
-      ]).then(([prev, curr]) => {
-        const {status} = curr;
-        if (199 < status && status < 400) {
-          cache.put(request, curr.clone());
-          return curr;
-        }
-        return prev || curr;
-      })
-    )
-  );
+  e.respondWith(live(request));
 });
 
 addEventListener('install', e => {
