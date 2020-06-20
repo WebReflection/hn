@@ -10,7 +10,7 @@ import umeta from 'umeta';
 import * as ucontent from 'ucontent';
 
 // node specific
-import asTemplate from './as-template.js';
+import partial from './args.js';
 
 // isomorphic
 import hn from '../client/@/js/hn.js';
@@ -49,14 +49,16 @@ const getModel = async (model) => (
 );
 
 const renderPage = (res, template, nav, main) => {
+  const params = partial(template);
   res.writeHead(200, HTML);
-  render(res, html(
-    asTemplate(template),
-    SSR,
-    header(nav),
-    main,
-    footer()
-  )).end();
+  render(
+    res,
+    html(...params({
+      SSR, main,
+      header: header(nav),
+      footer: footer()
+    }))
+  ).end();
 };
 
 // serving
@@ -136,8 +138,9 @@ createServer(async (req, res) => {
     default: {
       // root of the site
       if (/^\/(?:\?.*)?$/.test(url)) {
+        const params = partial('index.html');
         res.writeHead(200, HTML);
-        render(res, html(asTemplate('index.html'))).end();
+        render(res, html(...params())).end();
       }
       // about page
       else if (/\/about\/$/.test(url))

@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "firebase": "^7.15.1",
+    "tag-params": "^1.0.6",
     "ucdn": "^0.18.0",
     "ucontent": "^1.5.2",
     "umeta": "^0.2.4"
