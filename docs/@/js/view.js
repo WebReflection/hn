@@ -61,7 +61,7 @@ ${n(e,l,i)} ${t.map(({index:e,model:t={}})=>a`
 <div>${e}</div>
 <div>
 <h2>
-<a onclick=${s} href=${t.url||"../item/?"+t.id}>${t.title||"..."}
+<a onclick=${t.url?Object:s} href=${t.url||"../item/?"+t.id}>${t.title||"..."}
 <small>
 ${(t.hostname||"").replace(/^www\./,"")}
 </small>

@@ -149,7 +149,7 @@ export default ({html}) => {
             <div>
               <h2>
                 <a
-                  onclick=${scrollTop}
+                  onclick=${model.url ? Object : scrollTop}
                   href='${model.url || `../item/?${model.id}`}'
                 >${model.title || '...'}
                   <small>
