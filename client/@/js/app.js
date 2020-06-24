@@ -242,7 +242,7 @@ Promise.all([
           const {title} = document;
           if (navigator.share)
             navigator.share({
-              text: title,
+              text: url,
               title,
               url
             });
