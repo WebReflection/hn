@@ -27,14 +27,14 @@ addEventListener('fetch', e => {
           };
           curr.headers.forEach((v, k) => { headers[k] = v; });
           const clone = curr.clone();
-          return curr.blob().then(body => {
+          e.waitUntil(curr.blob().then(body => {
             cache.put(request, new Response(body, {
               status: curr.status,
               statusText: curr.statusText,
               headers
             }));
-            return clone;
-          });
+          }));
+          return clone;
         }
         return prev || curr;
       })
