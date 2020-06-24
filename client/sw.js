@@ -1,3 +1,7 @@
+// expiration time in seconds: one week
+const EXPIRATION = 7 * 24 * 3600;
+const EXPIRATION_KEY = 'sw-cache-expires';
+
 const offline = () => new Response('null', teapot);
 const teapot = {
   headers: {'Content-Type': 'application/json'},
@@ -16,8 +20,21 @@ addEventListener('fetch', e => {
       ]).then(([prev, curr]) => {
         const {status} = curr;
         if (199 < status && status < 400) {
-          cache.put(request, curr.clone());
-          return curr;
+          const headers = {
+            [EXPIRATION_KEY]: new Date(
+              Date.now() + EXPIRATION * 1000
+            ).toUTCString()
+          };
+          curr.headers.forEach((v, k) => { headers[k] = v; });
+          const clone = curr.clone();
+          return curr.blob().then(body => {
+            cache.put(request, new Response(body, {
+              status: curr.status,
+              statusText: curr.statusText,
+              headers
+            }));
+            return clone;
+          });
         }
         return prev || curr;
       })
@@ -38,4 +55,26 @@ addEventListener('install', e => {
       './top/?1'
     ]))
   );
+});
+
+addEventListener('message', ({data}) => {
+  const {action} = data;
+  switch (action) {
+    case 'purge':
+      const now = Date.now();
+      openCache.then(cache => {
+        cache.keys().then(keys => {
+          keys.forEach(key => {
+            cache.match(key).then(({headers}) => {
+              if (headers.has(EXPIRATION_KEY)) {
+                const date = Date.parse(headers.get(EXPIRATION_KEY));
+                if (date < now)
+                  cache.delete(key);
+              }
+            });
+          });
+        });
+      });
+      break;
+  }
 });

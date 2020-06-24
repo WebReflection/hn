@@ -289,6 +289,11 @@ Promise.all([
 
   // make it a PWA 🎉
   if ('serviceWorker' in navigator)
-    navigator.serviceWorker.register('../sw.js', {scope: '../'});
-
+    navigator.serviceWorker.register('../sw.js', {scope: '../'})
+    .then(() => navigator.serviceWorker.ready)
+    .then(() => {
+      const {controller} = navigator.serviceWorker;
+      if (controller)
+        controller.postMessage({action: 'purge'});
+    });
 });
