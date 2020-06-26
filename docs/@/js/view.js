@@ -1,24 +1,24 @@
-const e=(a=[])=>a.reduce((a,t)=>a+e((t.model||{}).comments),a.length),a=(e,a)=>(1!==(e>>>=0)&&(a+="s"),`${e} ${a}`),t=(e,a)=>e===a?"selected":"",s=()=>{scrollTo({top:0,left:0,behavior:"smooth"})},o=(e=Date.now(),t=Date.now()/1e3)=>{const s=t-e;return s<3600?a(s/60,"minute"):s<86400?a(s/3600,"hour"):a(s/86400,"day")};export default({html:a})=>{const l=({model:t={comments:[]}})=>a`
+const e=(a=[])=>a.reduce((a,t)=>a+e((t.model||{}).comments),a.length),a=(e,a)=>(1!==(e>>>=0)&&(a+="s"),`${e} ${a}`),t=(e,a)=>e===a?"selected":"",s=()=>{scrollTo({top:0,left:0,behavior:"smooth"})};let o=0;const l=new Map,n=(e=Date.now(),t=Date.now()/1e3)=>{const s=t-e;return s<3600?a(s/60,"minute"):s<86400?a(s/3600,"hour"):a(s/86400,"day")};export default({html:a})=>{const i=({model:t={comments:[]}})=>a`
 <li class=${t.id?"":"placeholder"} .hidden=${!!t.deleted}>
 <small>
 <a onclick=${s} href=${"../user/?"+t.by}>${t.by||"..."}</a>
-${o(t.time)} ago
+${n(t.time)} ago
 <a href=#collapse data-count=${e(t.comments)} />
 </small>
 <div>
-${a([t.text||"..."])}
+${a(l.get(t.text||"...")||(e=>{o||(o=setTimeout(()=>{o=0,l.clear()},1e4));const a=[e];return l.set(e,a),a})(t.text||"..."))}
 </div>
 <ul class=comments .hidden=${!t.comments.length}>
-${t.comments.map(l)}
+${t.comments.map(i)}
 </ul>
 </li>
-`,i=()=>a`
+`,r=()=>a`
 <div class=paginator>
 <a href=#back>&lt;</a>
 <span>go back / share</span>
 <a href=#share>📤</a>
 </div>
-`,n=(e,t,o)=>a`
+`,c=(e,t,o)=>a`
 <div class=paginator>
 <a onclick=${s} href=${`../${e}/?${t-1}`} class=${1===t?"hidden":""}>
 &lt;
@@ -54,14 +54,14 @@ Powered by
 &
 <a href=https://github.com/HackerNews/API>Hacker News API</a>
 </footer>
-`,main:(e,t,l,i)=>a`
+`,main:(e,t,o,l)=>a`
 <main class=stories>
-${n(e,l,i)} ${t.map(({index:e,model:t={}})=>a`
+${c(e,o,l)} ${t.map(({index:e,model:t={}})=>a`
 <article class=${t.id?"":"placeholder"}>
 <div>${e}</div>
 <div>
 <h2>
-<a onclick=${t.url?Object:s} href=${t.url||"../item/?"+t.id}>${t.title||"..."}
+<a onclick=${t.url?Object:s} href=${t.url||"../item/?"+t.id} target=${t.url?"_blank":"_self"}>${t.title||"..."}
 <small>
 ${(t.hostname||"").replace(/^www\./,"")}
 </small>
@@ -70,16 +70,16 @@ ${(t.hostname||"").replace(/^www\./,"")}
 <p>
 ${t.score} points by
 <a onclick=${s} href=${"../user/?"+t.by}>${t.by}</a>
-${o(t.time)} ago |
+${n(t.time)} ago |
 <a class=nowrap onclick=${s} href=${"../item/?"+t.id}>${t.descendants||0} comments</a>
 </p>
 </div>
 </article>
-`)} ${n(e,l,i)}
+`)} ${c(e,o,l)}
 </main>
 `,details:e=>a`
 <main class=details>
-${i()}
+${r()}
 <article>
 <h2>
 <a href=${e.url}>
@@ -90,20 +90,20 @@ ${e.title}
 <p class=meta>
 ${e.score} points by
 <a onclick=${s} href=${"../user/?"+e.by}>${e.by}</a>
-${o(e.time)} ago
+${n(e.time)} ago
 </p>
 </article>
 <h3>
 ${e.descendants||0} comments
 </h3>
 <ul .hidden=${!e.comments.length}>
-${e.comments.map(l)}
+${e.comments.map(i)}
 </ul>
-${i()}
+${r()}
 </main>
 `,profile:({about:e,created:t,id:s,karma:o})=>a`
 <main class=profile>
-${i()}
+${r()}
 <article>
 <h1>${s}</h1>
 <p>
@@ -118,11 +118,11 @@ ${i()}
 ${a([e])}
 </div>
 </article>
-${i()}
+${r()}
 </main>
 `,notFound:()=>a`
 <main class=not-found>
-${i()}
+${r()}
 <article>
 <h1>Not Found</h1>
 <p>The page you are looking for is not here.</p>

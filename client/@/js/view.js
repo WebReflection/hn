@@ -28,6 +28,16 @@ const scrollTop = () => {
   scrollTo({top: 0, left: 0, behavior: 'smooth'});
 };
 
+let cleanup = 0;
+const content = new Map;
+const cache = chunk => {
+  if (!cleanup)
+    cleanup = setTimeout(() => { cleanup = 0; content.clear(); }, 10000);
+  const template = [chunk];
+  content.set(chunk, template);
+  return template;
+};
+
 const timeBetween = (
   a = Date.now(),
   b = (Date.now() / 1e3)
@@ -58,7 +68,7 @@ export default ({html}) => {
         <a href="#collapse" data-count=${count(model.comments)} />
       </small>
       <div>
-        ${html([model.text || '...'])}
+        ${html(content.get(model.text || '...') || cache(model.text || '...'))}
       </div>
       <ul class="comments" .hidden=${!model.comments.length}>
         ${model.comments.map(comment)}
@@ -151,6 +161,7 @@ export default ({html}) => {
                 <a
                   onclick=${model.url ? Object : scrollTop}
                   href='${model.url || `../item/?${model.id}`}'
+                  target=${model.url ? '_blank' : '_self'}
                 >${model.title || '...'}
                   <small>
                     ${(model.hostname || '').replace(/^www\./, '')}
