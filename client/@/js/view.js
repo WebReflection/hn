@@ -228,9 +228,9 @@ export default ({html}) => {
             and has <strong>${karma}</strong> karma
           </p>
           <p>
-            <a href=${`https://news.ycombinator.com/submitted?id=${id}`}>submissions</a> /
-            <a href=${`https://news.ycombinator.com/threads?id=${id}`}>comments</a> /
-            <a href=${`https://news.ycombinator.com/favorites?id=${id}`}>favourites</a>
+            <a href=${`https://news.ycombinator.com/submitted?id=${id}`} target="_blank">submissions</a> /
+            <a href=${`https://news.ycombinator.com/threads?id=${id}`} target="_blank">comments</a> /
+            <a href=${`https://news.ycombinator.com/favorites?id=${id}`} target="_blank">favourites</a>
           </p>
           <div class='about' .hidden=${!about}>
             ${html([about])}

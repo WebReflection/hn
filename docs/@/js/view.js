@@ -1,4 +1,4 @@
-const e=(a=[])=>a.reduce((a,t)=>a+e((t.model||{}).comments),a.length),a=(e,a)=>(1!==(e>>>=0)&&(a+="s"),`${e} ${a}`),t=(e,a)=>e===a?"selected":"",s=()=>{scrollTo({top:0,left:0,behavior:"smooth"})};let o=0;const l=new Map,n=(e=Date.now(),t=Date.now()/1e3)=>{const s=t-e;return s<3600?a(s/60,"minute"):s<86400?a(s/3600,"hour"):a(s/86400,"day")};export default({html:a})=>{const i=({model:t={comments:[]}})=>a`
+const e=(a=[])=>a.reduce((a,t)=>a+e((t.model||{}).comments),a.length),a=(e,a)=>(1!==(e>>>=0)&&(a+="s"),`${e} ${a}`),t=(e,a)=>e===a?"selected":"",s=()=>{scrollTo({top:0,left:0,behavior:"smooth"})};let o=0;const l=new Map,n=(e=Date.now(),t=Date.now()/1e3)=>{const s=t-e;return s<3600?a(s/60,"minute"):s<86400?a(s/3600,"hour"):a(s/86400,"day")};export default({html:a})=>{const r=({model:t={comments:[]}})=>a`
 <li class=${t.id?"":"placeholder"} .hidden=${!!t.deleted}>
 <small>
 <a onclick=${s} href=${"../user/?"+t.by}>${t.by||"..."}</a>
@@ -9,10 +9,10 @@ ${n(t.time)} ago
 ${a(l.get(t.text||"...")||(e=>{o||(o=setTimeout(()=>{o=0,l.clear()},1e4));const a=[e];return l.set(e,a),a})(t.text||"..."))}
 </div>
 <ul class=comments .hidden=${!t.comments.length}>
-${t.comments.map(i)}
+${t.comments.map(r)}
 </ul>
 </li>
-`,r=()=>a`
+`,i=()=>a`
 <div class=paginator>
 <a href=#back>&lt;</a>
 <span>go back / share</span>
@@ -79,7 +79,7 @@ ${n(t.time)} ago |
 </main>
 `,details:e=>a`
 <main class=details>
-${r()}
+${i()}
 <article>
 <h2>
 <a href=${e.url} target=${e.url?"_blank":"_self"}>
@@ -97,32 +97,32 @@ ${n(e.time)} ago
 ${e.descendants||0} comments
 </h3>
 <ul .hidden=${!e.comments.length}>
-${e.comments.map(i)}
+${e.comments.map(r)}
 </ul>
-${r()}
+${i()}
 </main>
 `,profile:({about:e,created:t,id:s,karma:o})=>a`
 <main class=profile>
-${r()}
+${i()}
 <article>
 <h1>${s}</h1>
 <p>
 ... joined <strong>${(e=>{const a=new Date,t=(new Date(a.getFullYear(),a.getMonth(),a.getDate())-new Date(1e3*e))/864e5;return t<0?"today":t<1?"yesterday":Math.ceil(t)+" days ago"})(t||0)}</strong>, and has <strong>${o}</strong> karma
 </p>
 <p>
-<a href=${"https://news.ycombinator.com/submitted?id="+s}>submissions</a> /
-<a href=${"https://news.ycombinator.com/threads?id="+s}>comments</a> /
-<a href=${"https://news.ycombinator.com/favorites?id="+s}>favourites</a>
+<a href=${"https://news.ycombinator.com/submitted?id="+s} target=_blank>submissions</a> /
+<a href=${"https://news.ycombinator.com/threads?id="+s} target=_blank>comments</a> /
+<a href=${"https://news.ycombinator.com/favorites?id="+s} target=_blank>favourites</a>
 </p>
 <div class=about .hidden=${!e}>
 ${a([e])}
 </div>
 </article>
-${r()}
+${i()}
 </main>
 `,notFound:()=>a`
 <main class=not-found>
-${r()}
+${i()}
 <article>
 <h1>Not Found</h1>
 <p>The page you are looking for is not here.</p>
