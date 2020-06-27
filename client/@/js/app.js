@@ -234,6 +234,7 @@ Promise.all([
           }
           break;
         case href === '#collapse':
+          event.preventDefault();
           link.closest('li').classList.toggle('collapsed');
           break;
         case href === '#share':
