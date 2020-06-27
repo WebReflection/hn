@@ -162,6 +162,7 @@ export default ({html}) => {
                   onclick=${model.url ? Object : scrollTop}
                   href='${model.url || `../item/?${model.id}`}'
                   target=${model.url ? '_blank' : '_self'}
+                  rel="noopener"
                 >${model.title || '...'}
                   <small>
                     ${(model.hostname || '').replace(/^www\./, '')}
@@ -193,7 +194,7 @@ export default ({html}) => {
         ${goBack()}
         <article>
           <h2>
-            <a href=${model.url} target=${model.url ? '_blank' : '_self'}>
+            <a href=${model.url} target=${model.url ? '_blank' : '_self'} rel="noopener">
               ${model.title}
               <small>${(model.hostname || '').replace(/^www\./, '')}</small>
             </a>
@@ -228,9 +229,12 @@ export default ({html}) => {
             and has <strong>${karma}</strong> karma
           </p>
           <p>
-            <a href=${`https://news.ycombinator.com/submitted?id=${id}`} target="_blank">submissions</a> /
-            <a href=${`https://news.ycombinator.com/threads?id=${id}`} target="_blank">comments</a> /
-            <a href=${`https://news.ycombinator.com/favorites?id=${id}`} target="_blank">favourites</a>
+            <a href=${`https://news.ycombinator.com/submitted?id=${id}`}
+               rel="noopener" target="_blank">submissions</a> /
+            <a href=${`https://news.ycombinator.com/threads?id=${id}`}
+               rel="noopener" target="_blank">comments</a> /
+            <a href=${`https://news.ycombinator.com/favorites?id=${id}`}
+               rel="noopener" target="_blank">favourites</a>
           </p>
           <div class='about' .hidden=${!about}>
             ${html([about])}
