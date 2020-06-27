@@ -82,7 +82,7 @@ ${n(t.time)} ago |
 ${r()}
 <article>
 <h2>
-<a href=${e.url}>
+<a href=${e.url} target=${e.url?"_blank":"_self"}>
 ${e.title}
 <small>${(e.hostname||"").replace(/^www\./,"")}</small>
 </a>

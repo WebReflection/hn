@@ -193,7 +193,7 @@ export default ({html}) => {
         ${goBack()}
         <article>
           <h2>
-            <a href=${model.url}>
+            <a href=${model.url} target=${model.url ? '_blank' : '_self'}>
               ${model.title}
               <small>${(model.hostname || '').replace(/^www\./, '')}</small>
             </a>
