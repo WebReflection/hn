@@ -1,6 +1,6 @@
 // expiration time in seconds: one week
 const EXPIRATION = 7 * 24 * 3600;
-const EXPIRATION_KEY = 'sw-cache-expires';
+const EXPIRATION_KEY = 'date';
 
 const offline = () => new Response('null', teapot);
 const teapot = {
@@ -20,21 +20,8 @@ addEventListener('fetch', e => {
       ]).then(([prev, curr]) => {
         const {status} = curr;
         if (199 < status && status < 400) {
-          const headers = {
-            [EXPIRATION_KEY]: new Date(
-              Date.now() + EXPIRATION * 1000
-            ).toUTCString()
-          };
-          curr.headers.forEach((v, k) => { headers[k] = v; });
-          const clone = curr.clone();
-          e.waitUntil(curr.blob().then(body => {
-            cache.put(request, new Response(body, {
-              status: curr.status,
-              statusText: curr.statusText,
-              headers
-            }));
-          }));
-          return clone;
+          cache.put(request, curr.clone());
+          return curr;
         }
         return prev || curr;
       })
