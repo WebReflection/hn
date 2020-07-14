@@ -21,13 +21,13 @@
   "author": "Andrea Giammarchi",
   "license": "ISC",
   "devDependencies": {
-    "ucompress": "^0.19.0"
+    "ucompress": "^0.20.3"
   },
   "dependencies": {
-    "firebase": "^7.15.1",
+    "firebase": "^7.16.0",
     "tag-params": "^1.0.6",
-    "ucdn": "^0.18.0",
-    "ucontent": "^1.5.2",
+    "ucdn": "^0.19.2",
+    "ucontent": "^2.0.0",
     "umeta": "^0.2.4"
   }
 }
