@@ -89,10 +89,21 @@ Promise.all([
     let revealing = true;
     let waitingForUpdates = true;
 
+    // ugly Firefox workaround when it gets stuck with the network
+    const clear = () => clearTimeout(timeout);
+    const timeout = setTimeout(
+      () => {
+        if (revealing)
+          location.reload(true);
+      },
+      5000
+    );
+
     switch (type) {
       // show a specific item details with comments
       case 'item':
         item(id).then(model => {
+          clear();
           if (model) {
             rIC(stopLoading);
             document.title = `iHN: ${model.title}`;
@@ -127,6 +138,7 @@ Promise.all([
       // show all items associated to this story
       case 'story':
         story(current).then(ids => {
+          clear();
           rIC(stopLoading);
           const total = Math.ceil(ids.length / ITEMS_PP);
           const start = ITEMS_PP * (page - 1);
@@ -159,6 +171,7 @@ Promise.all([
       // show user details
       case 'user':
         user(name).then(value => {
+          clear();
           if (revealing) {
             if (value) {
               rIC(stopLoading);
@@ -178,6 +191,7 @@ Promise.all([
         if (/\/about\/$/.test(url)) {
           const top = header({page, header: {current: 'about', stories}});
           about().then(content => {
+            clear();
             if (revealing) {
               rIC(stopLoading);
               document.title = 'iHN: about';
@@ -187,6 +201,7 @@ Promise.all([
         }
         // the 404 fallback
         else {
+          clear();
           rIC(stopLoading);
           updatePage(nav, notFound());
         }
@@ -220,12 +235,12 @@ Promise.all([
     const {target} = event;
     const link = target.closest('a');
     if (link) {
+      event.preventDefault();
       // consider only local links without
       // resolving through link.href ;-)
       const href = link.getAttribute('href');
       switch (true) {
         case href === '#back':
-          event.preventDefault();
           if (IS_BROWSER)
             history.back();
           else if (1 < state.length) {
@@ -234,11 +249,9 @@ Promise.all([
           }
           break;
         case href === '#collapse':
-          event.preventDefault();
           link.closest('li').classList.toggle('collapsed');
           break;
         case href === '#share':
-          event.preventDefault();
           const url = IS_BROWSER ? location.href : state[state.length - 1];
           const {title} = document;
           if (navigator.share)
@@ -268,12 +281,14 @@ Promise.all([
           }
           break;
         case /^(?:\.|\/)/.test(href):
-          event.preventDefault();
           show.next(href);
           if (IS_BROWSER)
             history.pushState(null, document.title, href);
           else if (MAX_STATE < state.push(href))
             state.shift();
+          break;
+        default:
+          open(href);
           break;
       }
     }
@@ -289,12 +304,19 @@ Promise.all([
   addEventListener('online', () => cache.clear());
 
   // make it a PWA 🎉
-  if ('serviceWorker' in navigator)
-    navigator.serviceWorker.register('../sw.js', {scope: '../'})
-    .then(() => navigator.serviceWorker.ready)
-    .then(() => {
-      const {controller} = navigator.serviceWorker;
-      if (controller)
-        controller.postMessage({action: 'purge'});
+  if ('serviceWorker' in navigator) {
+    const {serviceWorker} = navigator;
+    const waitController = new Promise($ => {
+      if (serviceWorker.controller)
+        $(serviceWorker.controller);
+      else
+        serviceWorker.register('./sw.js', {scope: './'})
+          .then(() => serviceWorker.ready)
+          .then(() => serviceWorker.getRegistration())
+          .then(({active}) => $(active));
     });
+    waitController.then(controller => {
+      controller.postMessage({action: 'purge'});
+    });
+  }
 });

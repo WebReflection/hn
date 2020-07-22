@@ -29,6 +29,10 @@ addEventListener('fetch', e => {
   );
 });
 
+addEventListener('activate', event => {
+  event.waitUntil(clients.claim());
+});
+
 addEventListener('install', e => {
   e.waitUntil(
     openCache.then(cache => cache.addAll([
